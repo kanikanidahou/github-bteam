@@ -6,10 +6,11 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1, minimum-scale=0.1, maximum-scale=4,user-scalable=yes">
     <!-- quaggaJSの読み込み -->
-    <script src="js/quagga.min.js"></script>
+    <script src="./js/quagga.min.js"></script>
     <script>
         var DetectedCount = 0, DetectedCode = "";
-        var video, tmp, tmp_ctx, jan, prev, prev_ctx, w, h, mw, mh, x1, y1;
+        var video, tmp, tmp_ctx, jan, jantxt, prev, prev_ctx, w, h, mw, mh, x1, y1;
+
         window.addEventListener('load', function (event) {
             video = document.createElement('video');
             video.setAttribute("autoplay", "");
@@ -20,7 +21,8 @@
             prev_ctx = prev.getContext("2d", { willReadFrequently: true });
             tmp = document.createElement('canvas');
             tmp_ctx = tmp.getContext("2d", { willReadFrequently: true });
-            jan = document.getElementById("jan");
+            //jan=document.getElementById("jan");
+            jantxt = document.getElementById("jantxt");
 
             //カメラ使用の許可ダイアログが表示される
             navigator.mediaDevices.getUserMedia(
@@ -75,10 +77,12 @@
                             src: reader.result,
                         };
                         Quagga.decodeSingle(config, function () { });
+                        //config["locator"]["patchSize"]="x-large";
+                        //Quagga.decodeSingle(config,function(){});
                     }
                     reader.readAsDataURL(blob);
                 });
-                setTimeout(Scan, 50, false);
+                setTimeout(Scan, 100, false);
             }
 
             Quagga.onDetected(function (result) {
@@ -90,14 +94,24 @@
                     DetectedCode = result.codeResult.code;
                 }
                 if (DetectedCount >= 3) {
-                    console.log(result.codeResult.code);
-                    jan.value += result.codeResult.code + '\n';
-                    jan.scrollTop = jan.scrollHeight;
+                    //console.log(result.codeResult.code);
+                    //jan.value+=result.codeResult.code+'\n';
+                    //jan.scrollTop=jan.scrollHeight;
+                    jantxt.value = result.codeResult.code;
                     DetectedCode = '';
                     DetectedCount = 0;
                 }
             });
         });
+
+        function imgReverse(flag) {
+            if (flag) {
+                prev.style.transform = "scaleX(-1)";
+            } else {
+                prev.style.transform = "scaleX(1)";
+            }
+        }
+    
         function GetData() {
             url = "https://www.googleapis.com/books/v1/volumes?q=isbn:"; //ISBNの手前まで
             isbn = document.getElementById("ISBN").value;
